@@ -20,7 +20,7 @@ public class BestPriceButtonDemo extends Application {
 
     @Override public void init() {
         control = new BestPriceButtonControl();
-        control.setCurrencyCouple("title title title");
+        control.setCurrencyCouple("EURUSD");
     }
 
     @Override public void start(Stage stage) {

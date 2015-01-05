@@ -2,7 +2,6 @@ package eu.smeo.javafx.trading;
 
 import javafx.collections.ListChangeListener;
 import javafx.geometry.VPos;
-import javafx.scene.Group;
 import javafx.scene.control.SkinBase;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
@@ -24,20 +23,18 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
     private static final double MAXIMUM_HEIGHT = 1024;
     private static double aspectRatio = PREFERRED_HEIGHT / PREFERRED_WIDTH;
 
-    private static final DropShadow FOREGROUND_SHADOW  = new DropShadow();
+    private static final DropShadow FOREGROUND_SHADOW = new DropShadow();
 
     private Region main;
 
     private Text currencyCoupleText;
-    private SidePane leftSidePane;
-    private SidePane rightSidePane;
 
     private Pane pane;
     private double width;
     private double height;
 
-    private Text title;
     private Font titleFont;
+    private SidePane leftSidePane;
 //    private Group shadowGroup;
 
 
@@ -57,12 +54,12 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(observable -> resize() );
-        getSkinnable().heightProperty().addListener(observable -> resize() );
-        getSkinnable().currencyCoupleProperty().addListener(observable -> updateGraphics() );
-        getSkinnable().getStyleClass().addListener((ListChangeListener.Change<? extends String> c) ->{
-                resize();
-                updateGraphics();
+        getSkinnable().widthProperty().addListener(observable -> resize());
+        getSkinnable().heightProperty().addListener(observable -> resize());
+        getSkinnable().currencyCoupleProperty().addListener(observable -> updateGraphics());
+        getSkinnable().getStyleClass().addListener((ListChangeListener.Change<? extends String> c) -> {
+            resize();
+            updateGraphics();
         });
 
         addChangeListenersForSide(getSkinnable().getLeftSide());
@@ -76,18 +73,16 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
     }
 
     private void initGraphics() {
-        // lift side pane
-        leftSidePane = new SidePane();
-        updateSidePane(getSkinnable().getLeftSide(), leftSidePane);
-
-        rightSidePane = new SidePane();
-        updateSidePane(getSkinnable().getRightSide(), rightSidePane);
 
         main = new Region();
         main.getStyleClass().setAll("main");
-      //  main.setOpacity(getSkinnable().isBackgroundVisible() ? 1 : 0);
+        //  main.setOpacity(getSkinnable().isBackgroundVisible() ? 1 : 0);
 
         currencyCoupleText = new Text(getSkinnable().getCurrencyCouple());
+
+
+        leftSidePane = new SidePane(titleFont, 0.1666666667);
+
 
 //        title.getStyleClass().setAll("fg");
 //        title.setOpacity(getSkinnable().isTitleVisible() ? 1 : 0);
@@ -97,7 +92,7 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
 //        shadowGroup.getChildren().setAll(title);
 
         pane = new Pane();
-        pane.getChildren().setAll(leftSidePane, rightSidePane);
+        pane.getChildren().setAll(leftSidePane, currencyCoupleText);
         pane.getStyleClass().setAll("main");
 
 //
@@ -107,12 +102,6 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
         resize();
     }
 
-    private void updateSidePane(BestPriceButtonControl.SingleSideControl sideControl, SidePane sidePane) {
-        sidePane.action.setText(sideControl.getAction());
-        sidePane.bigFigure.setText(sideControl.getBigFigure());
-        sidePane.pips.setText(sideControl.getPips());
-        sidePane.smallFigure.setText(sideControl.getSmallFigure());
-    }
 
     private void updateFonts() {
         titleFont = Font.font(getSkinnable().getTitleFont(), FontWeight.BOLD, (0.1666666667 * height));
@@ -122,13 +111,10 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
     private void updateGraphics() {
         // Update the title
         currencyCoupleText.setText(getSkinnable().getCurrencyCouple());
-        updateSidePane(getSkinnable().getLeftSide(), leftSidePane);
-        updateSidePane(getSkinnable().getRightSide(), rightSidePane);
+        leftSidePane.setValue("1.23", "99", "023");
 
-//        title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
+        //currencyCoupleText.setX((width - currencyCoupleText.getLayoutBounds().getWidth()) * 0.5);
     }
-
-
 
 
     private void resize() {
@@ -148,16 +134,15 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
 
             // Setup the font for the lcd title, number system, min measured, max measure and former value
             // Title
-//            title.setFont(titleFont);
-//            title.setTextOrigin(VPos.BASELINE);
-//            title.setTextAlignment(TextAlignment.CENTER);
-//            title.setText(getSkinnable().getCurrencyCouple());
-//            title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
-//            title.setY(main.getLayoutY() + title.getLayoutBounds().getHeight() - 0.04 * height + 2);
-
-            
+            currencyCoupleText.setFont(titleFont);
+            currencyCoupleText.setTextOrigin(VPos.BASELINE);
+            currencyCoupleText.setTextAlignment(TextAlignment.CENTER);
+            currencyCoupleText.setText(getSkinnable().getCurrencyCouple());
+            currencyCoupleText.setX((width + currencyCoupleText.getLayoutBounds().getWidth()) * 0.5);
+            currencyCoupleText.setY(main.getLayoutY() + currencyCoupleText.getLayoutBounds().getHeight() - 0.01 * height + 2);
         }
 
+        this.leftSidePane.relocate(0,0, width, height);
     }
 
     private void init() {
@@ -199,26 +184,57 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
     }
 
     private class SidePane extends Pane {
-        Text action;
-        Text bigFigure;
-        Text pips;
-        Text smallFigure;
+        Font font;
+        Text bigFigure = new Text();
+        Text pips = new Text();
+        Text smallFigure = new Text();
+        private double fontSizeFactor;
 
-        SidePane(){
-            this.setStyle("-fx-background-color: slateblue; -fx-text-fill: white;");
-            this.action = new Text();
-            this.action.setFont(titleFont);
+        public SidePane(Font font, double fontSizeFactor) {
+            super();
+            this.fontSizeFactor = fontSizeFactor;
+            this.font = font;
+            bigFigure.setFont(font);
+            pips.setFont(font);
+            smallFigure.setFont(font);
 
-            this.bigFigure = new Text();
-            this.bigFigure.setFont(titleFont);
+            bigFigure.setText("--");
+            pips.setText("--");
+            smallFigure.setText("--");
 
-            this.pips = new Text();
-            this.pips.setFont(titleFont);
+            getChildren().addAll(bigFigure, pips, smallFigure);
+        }
 
-            this.smallFigure = new Text();
-            this.smallFigure.setFont(titleFont);
+        public void setValue(String bigFigure, String pips, String smallFigure) {
+            this.bigFigure.setText(bigFigure);
+            this.pips.setText(pips);
+            this.smallFigure.setText(smallFigure);
+        }
 
-            getChildren().addAll(action,bigFigure,pips,smallFigure);
+        public void relocate(double x, double y, double width, double height) {
+            double bigFigureFontSize = height * 0.15;
+            double pipFontSize = height * 0.65;
+            double smallFigureFontSize = bigFigureFontSize;
+
+            double onePercentHeight = height / 100.0;
+            double onePercentWidth = width / 100.0;
+
+            bigFigure.setFont(Font.font(getSkinnable().getTitleFont(), FontWeight.BOLD, bigFigureFontSize));
+            pips.setFont(Font.font(getSkinnable().getTitleFont(), FontWeight.BOLD, pipFontSize));
+            smallFigure.setFont(Font.font(getSkinnable().getTitleFont(), FontWeight.BOLD, smallFigureFontSize));
+
+            bigFigure.getLayoutBounds().getWidth();
+            bigFigure.getLayoutBounds().getHeight();
+
+            bigFigure.setX(x+onePercentWidth);
+            double separator = (bigFigure.getLayoutBounds().getWidth() * 0.1);
+            pips.setX(x+bigFigure.getX() + (bigFigure.getLayoutBounds().getWidth() + separator));
+            smallFigure.setX(x+pips.getX() + (pips.getLayoutBounds().getWidth() + separator));
+
+            bigFigure.setY(y);
+            pips.setY(y + bigFigure.getLayoutBounds().getHeight());
+            smallFigure.setY(y + pips.getY());
         }
     }
+
 }

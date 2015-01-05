@@ -27,13 +27,18 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
     private static final DropShadow FOREGROUND_SHADOW  = new DropShadow();
 
     private Region main;
+
+    private Text currencyCoupleText;
+    private SidePane leftSidePane;
+    private SidePane rightSidePane;
+
     private Pane pane;
     private double width;
     private double height;
 
     private Text title;
     private Font titleFont;
-    private Group shadowGroup;
+//    private Group shadowGroup;
 
 
     /**
@@ -54,29 +59,45 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
     private void registerListeners() {
         getSkinnable().widthProperty().addListener(observable -> resize() );
         getSkinnable().heightProperty().addListener(observable -> resize() );
-        getSkinnable().titleProperty().addListener(observable -> updateGraphics() );
+        getSkinnable().currencyCoupleProperty().addListener(observable -> updateGraphics() );
         getSkinnable().getStyleClass().addListener((ListChangeListener.Change<? extends String> c) ->{
                 resize();
                 updateGraphics();
         });
+
+        addChangeListenersForSide(getSkinnable().getLeftSide());
+        addChangeListenersForSide(getSkinnable().getRightSide());
+    }
+
+    private void addChangeListenersForSide(BestPriceButtonControl.SingleSideControl leftSide) {
+        leftSide.actionProperty().addListener(observable -> updateGraphics());
+        leftSide.bigFigureProperty().addListener(observable -> updateGraphics());
+        leftSide.pipsProperty().addListener(observable -> updateGraphics());
     }
 
     private void initGraphics() {
+        // lift side pane
+        leftSidePane = new SidePane();
+        updateSidePane(getSkinnable().getLeftSide(), leftSidePane);
+
+        rightSidePane = new SidePane();
+        updateSidePane(getSkinnable().getRightSide(), rightSidePane);
+
         main = new Region();
         main.getStyleClass().setAll("main");
       //  main.setOpacity(getSkinnable().isBackgroundVisible() ? 1 : 0);
 
-        title = new Text(getSkinnable().getTitle());
+        currencyCoupleText = new Text(getSkinnable().getCurrencyCouple());
 
 //        title.getStyleClass().setAll("fg");
-        title.setOpacity(getSkinnable().isTitleVisible() ? 1 : 0);
+//        title.setOpacity(getSkinnable().isTitleVisible() ? 1 : 0);
 
-        shadowGroup = new Group();
-        shadowGroup.setEffect(getSkinnable().isForegroundShadowVisible() ? FOREGROUND_SHADOW : null);
-        shadowGroup.getChildren().setAll(title);
+//        shadowGroup = new Group();
+//        shadowGroup.setEffect(getSkinnable().isForegroundShadowVisible() ? FOREGROUND_SHADOW : null);
+//        shadowGroup.getChildren().setAll(title);
 
         pane = new Pane();
-        pane.getChildren().setAll(shadowGroup);
+        pane.getChildren().setAll(leftSidePane, rightSidePane);
         pane.getStyleClass().setAll("main");
 
 //
@@ -86,6 +107,13 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
         resize();
     }
 
+    private void updateSidePane(BestPriceButtonControl.SingleSideControl sideControl, SidePane sidePane) {
+        sidePane.action.setText(sideControl.getAction());
+        sidePane.bigFigure.setText(sideControl.getBigFigure());
+        sidePane.pips.setText(sideControl.getPips());
+        sidePane.smallFigure.setText(sideControl.getSmallFigure());
+    }
+
     private void updateFonts() {
         titleFont = Font.font(getSkinnable().getTitleFont(), FontWeight.BOLD, (0.1666666667 * height));
     }
@@ -93,7 +121,10 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
 
     private void updateGraphics() {
         // Update the title
-        title.setText(getSkinnable().getTitle());
+        currencyCoupleText.setText(getSkinnable().getCurrencyCouple());
+        updateSidePane(getSkinnable().getLeftSide(), leftSidePane);
+        updateSidePane(getSkinnable().getRightSide(), rightSidePane);
+
 //        title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
     }
 
@@ -117,12 +148,14 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
 
             // Setup the font for the lcd title, number system, min measured, max measure and former value
             // Title
-            title.setFont(titleFont);
-            title.setTextOrigin(VPos.BASELINE);
-            title.setTextAlignment(TextAlignment.CENTER);
-            title.setText(getSkinnable().getTitle());
-            title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
-            title.setY(main.getLayoutY() + title.getLayoutBounds().getHeight() - 0.04 * height + 2);
+//            title.setFont(titleFont);
+//            title.setTextOrigin(VPos.BASELINE);
+//            title.setTextAlignment(TextAlignment.CENTER);
+//            title.setText(getSkinnable().getCurrencyCouple());
+//            title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
+//            title.setY(main.getLayoutY() + title.getLayoutBounds().getHeight() - 0.04 * height + 2);
+
+            
         }
 
     }
@@ -163,5 +196,29 @@ public class BestPriceButtonSkin extends SkinBase<BestPriceButtonControl> {
 
     private boolean eqZeroOrSmaller(double value) {
         return Double.compare(value, 0.0) <= 0;
+    }
+
+    private class SidePane extends Pane {
+        Text action;
+        Text bigFigure;
+        Text pips;
+        Text smallFigure;
+
+        SidePane(){
+            this.setStyle("-fx-background-color: slateblue; -fx-text-fill: white;");
+            this.action = new Text();
+            this.action.setFont(titleFont);
+
+            this.bigFigure = new Text();
+            this.bigFigure.setFont(titleFont);
+
+            this.pips = new Text();
+            this.pips.setFont(titleFont);
+
+            this.smallFigure = new Text();
+            this.smallFigure.setFont(titleFont);
+
+            getChildren().addAll(action,bigFigure,pips,smallFigure);
+        }
     }
 }

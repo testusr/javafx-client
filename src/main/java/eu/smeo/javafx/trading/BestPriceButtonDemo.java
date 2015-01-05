@@ -2,7 +2,6 @@ package eu.smeo.javafx.trading;
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -21,7 +20,7 @@ public class BestPriceButtonDemo extends Application {
 
     @Override public void init() {
         control = new BestPriceButtonControl();
-        control.setTitle("title title title");
+        control.setCurrencyCouple("title title title");
     }
 
     @Override public void start(Stage stage) {

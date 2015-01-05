@@ -9,8 +9,11 @@ import javafx.scene.control.Skin;
  * Created by smeo on 1/1/15.
  */
 public class BestPriceButtonControl extends Control {
-    private StringProperty titleFont;
-    private StringProperty titleProperty = new SimpleStringProperty("title", "title");
+    private StringProperty currencyCouple = new SimpleStringProperty("title", "title");
+
+    private SingleSideControl leftSide = new SingleSideControl();
+    private SingleSideControl rightSide = new SingleSideControl();
+
 
     public BestPriceButtonControl() {
         getStyleClass().add("bestprice-button");
@@ -36,18 +39,25 @@ public class BestPriceButtonControl extends Control {
         return "Open Sans";
     }
 
-    public StringProperty titleProperty() {
-        return titleProperty;
+    public StringProperty currencyCoupleProperty() {
+        return currencyCouple;
     }
 
-    public void setTitle(String title){
-        titleProperty.setValue(title);
+    public void setCurrencyCouple(String title){
+        currencyCouple.setValue(title);
     }
 
-    public String getTitle() {
-        return titleProperty.getValue();
+    public String getCurrencyCouple() {
+        return currencyCouple.getValue();
     }
 
+    public SingleSideControl getLeftSide() {
+        return leftSide;
+    }
+
+    public SingleSideControl getRightSide() {
+        return rightSide;
+    }
 
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
@@ -56,5 +66,67 @@ public class BestPriceButtonControl extends Control {
 
     @Override protected String getUserAgentStylesheet() {
         return getClass().getResource(getClass().getSimpleName().toLowerCase() + ".css").toExternalForm();
+    }
+
+    public static class SingleSideControl {
+        private StringProperty action;
+        private StringProperty bigFigure;
+        private StringProperty pips;
+        private StringProperty smallFigure;
+
+        SingleSideControl(){
+            action = new SimpleStringProperty("action", "---");
+            bigFigure = new SimpleStringProperty("bigFigure", "--");
+            pips = new SimpleStringProperty("pips", "--");
+            smallFigure = new SimpleStringProperty("smallFigure", "--");
+        }
+
+        public String getAction() {
+            return action.get();
+        }
+
+        public StringProperty actionProperty() {
+            return action;
+        }
+
+        public void setAction(String action) {
+            this.action.set(action);
+        }
+
+        public String getBigFigure() {
+            return bigFigure.get();
+        }
+
+        public StringProperty bigFigureProperty() {
+            return bigFigure;
+        }
+
+        public void setBigFigure(String bigFigure) {
+            this.bigFigure.set(bigFigure);
+        }
+
+        public String getPips() {
+            return pips.get();
+        }
+
+        public StringProperty pipsProperty() {
+            return pips;
+        }
+
+        public void setPips(String pips) {
+            this.pips.set(pips);
+        }
+
+        public String getSmallFigure() {
+            return smallFigure.get();
+        }
+
+        public StringProperty smallFigureProperty() {
+            return smallFigure;
+        }
+
+        public void setSmallFigure(String smallFigure) {
+            this.smallFigure.set(smallFigure);
+        }
     }
 }
